@@ -15,27 +15,28 @@ services:
       --host 0.0.0.0
       --port 8010
       --reload
-      --reload-dir api
+      --reload-dir /app/api
     volumes:
-      - ./api:/api
+      - ./api:/app/api
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:8010/healthz"]
+      test: ["CMD", "curl", "-fsS", "http://localhost:8010/health"]  # ← /health 로 통일
       interval: 10s
       timeout: 3s
       retries: 3
     restart: unless-stopped
-    # 필요 시 아키텍처 고정
 
   postgres:
     image: pgvector/pgvector:0.8.0-pg17
     container_name: chatbot-postgres
     environment:
-      - POSTGRES_DB:${POSTGRES_DATABASE}
+      - POSTGRES_DB=${POSTGRES_DATABASE}          # ← = 문법
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_MAX_CONNECTIONS=200
@@ -63,7 +64,7 @@ services:
       - "6379:6379"
     command: ["redis-server","--appendonly","yes"]
     volumes:
-      - redisdata:/data
+      - ./docker/data/redis/data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -71,6 +72,3 @@ services:
       retries: 5
     restart: unless-stopped
 
-volumes:
-  pgdata:
-  redisdata:

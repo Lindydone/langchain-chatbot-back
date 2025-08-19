@@ -1,3 +1,7 @@
 .env
 
 __pycache__/
+
+# Postgres data
+docker/data/pgsql/data/
+docker/data/redis/data/
