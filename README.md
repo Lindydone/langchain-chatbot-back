@@ -20,7 +20,6 @@ services)를 적용하여 유지보수성과 확장성을 높였습니다.
     │   ├── controllers/         # 비즈니스 로직 계층
     │   ├── adapters/            # 외부 연동 계층 (예: Redis, DB)
     │   ├── services/            # 서비스 계층 (추후 구현)
-    │   ├── dto/                 # 데이터 전송 객체 (추후 구현)
     │   └── schemas/             # Pydantic 모델 정의
     │
     ├── tests/                   # 테스트 코드
@@ -82,7 +81,6 @@ services)를 적용하여 유지보수성과 확장성을 높였습니다.
 📖 향후 확장 포인트
 
 -   api/services/ 계층에 핵심 도메인 로직 추가
--   api/dto/ 계층을 활용해 요청/응답 객체 분리
 -   api/adapters/에 DB, 외부 API 연동 모듈 추가
 -   tests/integration/ 디렉토리를 활용해 end-to-end 테스트 구현
 -   docker/config/nginx/nginx.conf 채워서 배포 환경 구성

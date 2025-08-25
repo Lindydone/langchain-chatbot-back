@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     openai_api_key: SecretStr | None = Field(None, alias="OPENAI_API_KEY")
 
     model_config = SettingsConfigDict(
-        env_file=".env",                 # 필요 시 ".env.test" 등으로 변경 가능
+        env_file=".env",                
         env_file_encoding="utf-8",
         case_sensitive=False,            # 대소문자 구분 없이 매핑
         extra="ignore",                  # 정의되지 않은 키는 무시(에러 방지)
