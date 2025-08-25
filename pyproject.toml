@@ -5,6 +5,10 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ai-back" 
 version = "0.1.0"
+dependencies = [
+    "fastapi>=0.116.1",
+    "pytest>=8.4.1",
+]
 
 [tool.setuptools]
 packages = ["api"] 
