@@ -57,7 +57,7 @@ services)를 적용하여 유지보수성과 확장성을 높였습니다.
 
 2. 로컬 실행
 
-    uv run uvicorn api.main:app --reload
+    uv run uvicorn main:app --reload
 
 → API 서버가 http://localhost:8000 에서 실행됩니다.
 

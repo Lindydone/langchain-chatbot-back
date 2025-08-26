@@ -1,20 +1,19 @@
-# api/core/config.py
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    # 기본 실행 환경
     env: str = Field("development", alias="ENV")
 
     # CORS
     allowed_origins: str = Field("*", alias="ALLOWED_ORIGINS")
 
+    model_provider: str = Field("dummy", alias="MODEL_PROVIDER")  # "dummy" | "openai" | "local" ...
+    model_name: str = Field("gpt-4o-mini", alias="MODEL_NAME")
     # Redis
     redis_host: str = Field("localhost", alias="REDIS_HOST")
     redis_port: int = Field(6379, alias="REDIS_PORT")
     redis_db_sess: int = Field(0, alias="REDIS_DB_SESS")
-    redis_password: str | None = Field(None, alias="REDIS_PASSWORD")
 
     # Postgres
     postgres_host: str = Field("localhost", alias="POSTGRES_HOST")
@@ -25,10 +24,18 @@ class Settings(BaseSettings):
     postgres_scheme: str = Field("postgresql+asyncpg", alias="POSTGRES_SCHEME")
 
     # 벡터/임베딩/키
-    pgvector_collection: str = Field("kb_default", alias="PGVECTOR_COLLECTION")
     embedding_model: str = Field("upskyy/bge-m3-korean", alias="EMBEDDING_MODEL")
     openai_api_key: SecretStr | None = Field(None, alias="OPENAI_API_KEY")
 
+    # OpenSearch
+    os_scheme: str = Field("http", alias="OS_SCHEME")
+    os_host: str = Field("opensearch", alias="OS_HOST")
+    os_port: int = Field(9200, alias="OS_PORT")
+    os_index: str = Field("rag_chunks", alias="OS_INDEX")
+    os_use_auth: bool = Field(False, alias="OS_USE_AUTH")
+    os_username: str | None = Field(None, alias="OS_USERNAME")
+    os_password: SecretStr | None = Field(None, alias="OS_PASSWORD")
+    
     model_config = SettingsConfigDict(
         env_file=".env",                
         env_file_encoding="utf-8",
@@ -36,7 +43,6 @@ class Settings(BaseSettings):
         extra="ignore",                  # 정의되지 않은 키는 무시(에러 방지)
     )
 
-    # 기존 코드가 settings.ALLOWED_ORIGINS로 접근하더라도 깨지지 않게 호환 프로퍼티 제공
     @property
     def ALLOWED_ORIGINS(self) -> str:
         return self.allowed_origins

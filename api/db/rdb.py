@@ -1,4 +1,3 @@
-# api/core/rdb.py
 from __future__ import annotations
 
 import os
@@ -68,7 +67,7 @@ async def init_db(*, create_tables: bool = True, enable_pgvector: bool = True) -
     """
     engine = _ensure_engine()
 
-    from api.models.chat import ChatSession, ChatMessage
+    from api.db.models.chat import ChatSession, ChatMessage
 
     async with engine.begin() as conn:
         if enable_pgvector:

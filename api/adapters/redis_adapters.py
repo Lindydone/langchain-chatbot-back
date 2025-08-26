@@ -1,5 +1,5 @@
 import redis
-from api.core.config import settings
+from config import settings
 
 class RedisAdapter:
     def __init__(self):

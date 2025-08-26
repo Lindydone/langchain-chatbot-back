@@ -4,14 +4,22 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.core.config import settings
-from api.core.db.rdb import init_db, dispose_engine
+from config import settings
+from api.db.rdb import init_db, dispose_engine
 from api.routers.api import api_router  
+
+from api.providers.factory import build_chat_model
+from api.core.graph import create_graph
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 앱 시작 시: SQLModel 테이블 생성
     await init_db(create_tables=True, enable_pgvector=True)
+
+    model = build_chat_model()
+    app.state.chat_model = model
+    app.state.chat_graph = create_graph(model)
+
     yield
     # 앱 종료 시: DB 엔진 정리
     await dispose_engine()
@@ -28,6 +36,7 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(api_router)
+
     return app
 
 app = create_app()
