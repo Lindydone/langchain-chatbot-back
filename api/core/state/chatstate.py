@@ -1,7 +1,8 @@
 from __future__ import annotations
 from typing import TypedDict, List, Dict, Optional
+from pydantic import Field
 
-Message = Dict[str, str]  # {"role": "system|user|assistant", "content": "..."}
+Message = Dict[str, str]
 
 class ModelOpts(TypedDict, total=False):
     temperature: float
@@ -10,8 +11,8 @@ class ModelOpts(TypedDict, total=False):
 class ChatState(TypedDict, total=False):
     messages: List[Message]
 
-    session_uid: Optional[str]
-    user_id: Optional[str]
+    session_id: str = Field(..., min_length=1) # 필수값으로 변경 무조건 필요한 값임 
+    user_id: str = Field(..., min_length=1)
     opts: ModelOpts
 
     error: Optional[str]

@@ -5,7 +5,7 @@ LangChain Chatbot Backend
 이 프로젝트는 LangChain 기반 챗봇 백엔드를 구축하기 위한 템플릿입니다.
 FastAPI를 기반으로 계층형 구조(routers, controllers, adapters,
 services)를 적용하여 유지보수성과 확장성을 높였습니다.
-테스트는 pytest를 활용하여 단위(Unit), 통합(Integration) 수준으로 관리할
+테스트는 pytest를 활용하여 단위(Unit), 통합(Integration), e2e(E2E)수준으로 관리할
 수 있습니다.
 
 ------------------------------------------------------------------------
@@ -25,7 +25,8 @@ services)를 적용하여 유지보수성과 확장성을 높였습니다.
     ├── tests/                   # 테스트 코드
     │   ├── conftest.py          # 공용 pytest fixture
     │   ├── unit/                # 단위 테스트
-    │   ├── integration/         # 통합 테스트 (추후 확장)
+    │   ├── integration/         # 통합 테스트
+    │   ├── e2e/                 # e2e 테스트
     │   └── test_data/           # 테스트용 데이터
     │
     ├── docker/                  # Docker 관련 설정

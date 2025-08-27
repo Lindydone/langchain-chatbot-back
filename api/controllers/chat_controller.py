@@ -1,25 +1,34 @@
 from typing import Dict, Any
+from uuid import uuid4
 from fastapi import HTTPException
 from api.schemas.chat.chat import ChatRequest, ChatResponse
 
 class ChatController:
     async def chat(self, req: ChatRequest, graph) -> ChatResponse:
-        # 1) LangGraph 상태 만들기
+        # 1) 입력 메시지 구성
         msgs = []
-        if req.system_prompt:
-            msgs.append({"role":"system", "content": req.system_prompt})
-        msgs.append({"role":"user", "content": req.message})
+        if getattr(req, "system_prompt", None):
+            msgs.append({"role": "system", "content": req.system_prompt})
+        msgs.append({"role": "user", "content": req.message})
 
-        state: Dict[str, Any] = {"messages": msgs}
-        if req.opts:  # temperature 등 전달
+        # 2) LangGraph State
+        state: Dict[str, Any] = {
+            "messages": msgs,
+            "session_id": req.session_id,
+            "user_id": req.user_id,
+        }
+        if getattr(req, "opts", None):
             state["opts"] = req.opts
 
-        # 2) 그래프 실행
+        # 3) 그래프 실행
         out = await graph.ainvoke(state)
 
-        # 3) 에러/정상 처리
+        # 4) 에러/정상 처리
         if out.get("error"):
             raise HTTPException(status_code=500, detail=out["error"])
 
         reply = out["messages"][-1]["content"]
-        return ChatResponse(reply=reply)
+        try:
+            return ChatResponse(reply=reply, session_id=state["session_id"]) 
+        except TypeError:
+            return ChatResponse(reply=reply)
