@@ -1,4 +1,4 @@
-# tests/unit/chat/test_chat_router.py
+
 def test_chat(client):
     r = client.post("/v1/chat", json={"message": "안녕"})
     assert r.status_code == 200

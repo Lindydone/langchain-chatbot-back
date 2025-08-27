@@ -1,5 +1,12 @@
+import os
 import pytest
 from fastapi.testclient import TestClient
+
+@pytest.fixture(scope="session", autouse=True)
+def _inject_integration_env(load_env):
+    base = os.path.dirname(os.path.dirname(__file__))  # tests/
+    env_path = os.path.join(base, "envs", "integration.env")
+    load_env(env_path, override=False)
 
 @pytest.fixture(scope="session")
 def app(app_base, real_lifespan_ctx):
@@ -9,6 +16,5 @@ def app(app_base, real_lifespan_ctx):
 
 @pytest.fixture()
 def client(app):
-    # lifespan 보장
     with TestClient(app) as c:
         yield c
