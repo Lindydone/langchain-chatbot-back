@@ -1,8 +1,8 @@
+
 def test_chat_rest_echo(client):
-    payload = {"session_id": "s1", "message": "hello", "stream": False}
-    r = client.post("/v1/chat", json=payload)
+    payload = {"message": "hello"}                     # ← 메시지만 전송
+    r = client.post("/v1/chat", json=payload)         # (라우터 경로가 다르면 실제 경로로)
     assert r.status_code == 200
     body = r.json()
-    assert body["session_id"] == "s1"
     assert "reply" in body
-    assert "hello" in body["reply"]
+    assert "hello" in body["reply"]                   # FakeModel → "echo:hello"

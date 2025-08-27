@@ -1,7 +1,10 @@
 .env
 
 __pycache__/
+.pytest_cache/
 
 # Postgres data
 docker/data/pgsql/data/
 docker/data/redis/data/
+
+ai_back.egg-info/

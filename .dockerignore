@@ -8,3 +8,6 @@ __pycache__/
 .idea
 
 tests/
+
+.pytest_cache/
+ai_back.egg-info/
