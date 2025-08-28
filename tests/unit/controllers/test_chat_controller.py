@@ -1,19 +1,14 @@
 import pytest
 from api.controllers.chat_controller import ChatController
 from api.schemas.chat.chat import ChatRequest
-from api.core.graph import create_graph
-
-class FakeModel:
-    async def generate(self, messages, **opts):
-        last = next((m["content"] for m in reversed(messages) if m["role"]=="user"), "")
-        return f"echo:{last.strip()}"
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("message", ["hello", "안녕하세요", "trim?"])
-async def test_chat_controller_basic(message):
+async def test_chat_controller_basic(message, min_graph):
     controller = ChatController()
-    graph = create_graph(FakeModel())
-    req = ChatRequest(message=message)
-    res = await controller.chat(req, graph)
+    req = ChatRequest(message=message, session_id="test-s1", user_id="u-1")
+    res = await controller.chat(req, min_graph)
+
     assert hasattr(res, "reply")
-    assert "echo" in res.reply
+    assert res.reply.startswith(f"echo:{message.strip()}")
+    assert res.reply.endswith(" [persist]")

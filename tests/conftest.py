@@ -13,6 +13,7 @@ if ROOT not in sys.path:
 from main import create_app
 
 from api.core.graph import create_graph
+from utils.graph import make_min_graph_with_persist
 
 # ── 빠른 유닛 테스트용 Fake 모델 ──
 class FakeModel:
@@ -20,20 +21,19 @@ class FakeModel:
         last = next((m["content"] for m in reversed(messages) if m["role"] == "user"), "")
         return f"echo:{last.strip()}"
 
-# ── lifespan 컨텍스트 ──
+# ── lifespan test용 가짜 모델/그래프 ──
 @asynccontextmanager
 async def lifespan_fake(app):
     app.state.chat_model = FakeModel()
-    app.state.chat_graph = create_graph(app.state.chat_model)
+    app.state.chat_graph = make_min_graph_with_persist(app.state.chat_model)
     yield
 
 @asynccontextmanager
 async def lifespan_real(app):
-    # 통합테스트 때 사용(실 모델/환경)
     from api.providers.factory import build_chat_model
     model = build_chat_model()
     app.state.chat_model = model
-    app.state.chat_graph = create_graph(model)
+    app.state.chat_graph = create_graph(model) 
     yield
 
 # ── 하위 conftest가 선택하는 픽스처 ──
@@ -56,6 +56,27 @@ def client(app):
     with TestClient(app) as c:
         yield c
 
+
+@pytest.fixture
+def req_payload():
+    """
+    기본 채팅 요청 페이로드 생성기
+    message/session_id/user_id를 테스트 값으로 채움
+    """
+    def _make(
+        message: str = "test",
+        session_id: str = "test-s1",
+        user_id: str = "u-1",
+        **overrides,
+    ):
+        payload = {
+            "message": message,
+            "session_id": session_id,
+            "user_id": user_id,
+        }
+        payload.update(overrides)
+        return payload
+    return _make
 
 # ── 테스트용 env 로딩 ──
 def _load_env_file_early(path: str, override: bool = False):
@@ -97,3 +118,8 @@ def load_env():
             if override or k not in os.environ:
                 os.environ[k] = v
     return _load_env_file
+
+# --- controller 유닛테스트용 ---
+@pytest.fixture(scope="function")
+def min_graph():
+    return make_min_graph_with_persist(FakeModel())

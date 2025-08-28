@@ -1,6 +1,6 @@
 
-def test_chat_rest_echo(client):
-    payload = {"message": "hello"}
+def test_chat_rest_echo(client, req_payload):
+    payload = req_payload(message="hello")
     r = client.post("/v1/chat", json=payload)
     assert r.status_code == 200
     body = r.json()

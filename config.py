@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     redis_port: int = Field(6379, alias="REDIS_PORT")
     redis_db_sess: int = Field(0, alias="REDIS_DB_SESS")
     redis_password: str = Field("", alias="REDIS_PASSWORD")
-    
+
     # Postgres
     postgres_host: str = Field("localhost", alias="POSTGRES_HOST")
     postgres_port: int = Field(5432, alias="POSTGRES_PORT")
@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     os_use_auth: bool = Field(False, alias="OS_USE_AUTH")
     os_username: str | None = Field(None, alias="OS_USERNAME")
     os_password: SecretStr | None = Field(None, alias="OS_PASSWORD")
-    
+
     model_config = SettingsConfigDict(
         env_file=".env",                
         env_file_encoding="utf-8",
