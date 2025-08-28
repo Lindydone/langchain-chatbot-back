@@ -11,13 +11,13 @@ services:
     ports:
       - "8010:8010"
     command: >
-      uvicorn api.main:app
+      uvicorn main:app
       --host 0.0.0.0
       --port 8010
       --reload
-      --reload-dir /app/api
+      --reload-dir /app
     volumes:
-      - ./api:/app/api
+      - .:/app
     depends_on:
       postgres:
         condition: service_healthy
@@ -31,6 +31,8 @@ services:
       timeout: 3s
       retries: 3
     restart: unless-stopped
+    networks:
+      - chatbot
 
   postgres:
     image: pgvector/pgvector:0.8.0-pg17
@@ -56,13 +58,14 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
-
+    networks:
+      - chatbot
   redis:
     image: redis:7-alpine
     container_name: chatbot-redis
     ports:
       - "6379:6379"
-    command: ["redis-server","--appendonly","yes"]
+    command: ["redis-server","--appendonly","yes","--requirepass","redis"]
     volumes:
       - ./docker/data/redis/data:/data
     healthcheck:
@@ -71,4 +74,37 @@ services:
       timeout: 3s
       retries: 5
     restart: unless-stopped
+    networks:
+      - chatbot
+  opensearch:
+    image: opensearchproject/opensearch:2.12.0
+    profiles: ["search"]                  # ← 중요
+    container_name: opensearch
+    environment:
+      - discovery.type=single-node
+      - plugins.security.disabled=true    # dev only (운영에선 활성화/인증 필수)
+      - OPENSEARCH_JAVA_OPTS=-Xms2g -Xmx2g
+    ulimits:
+      memlock: { soft: -1, hard: -1 }
+    ports: ["9200:9200","9600:9600"]
+    volumes:
+      - os-data:/usr/share/opensearch/data
+    networks:
+      - chatbot
+  dashboards:
+    image: opensearchproject/opensearch-dashboards:2.12.0
+    profiles: ["search"]                  # ← 중요
+    container_name: os-dashboards
+    environment:
+      - OPENSEARCH_HOSTS=http://opensearch:9200
+      - OPENSEARCH_SECURITY_ENABLED=false     # dev only
+    ports: ["5601:5601"]
+    depends_on: [opensearch]
+    networks:
+      - chatbot
+volumes:
+  os-data:
 
+networks:
+  chatbot:
+    name: chatbot
