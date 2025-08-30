@@ -7,5 +7,6 @@ controller = ChatController()
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat_rest(req: ChatRequest, request: Request):
+    print("/chat 라우터 시작 ")
     graph = request.app.state.chat_graph
     return await controller.chat(req, graph)

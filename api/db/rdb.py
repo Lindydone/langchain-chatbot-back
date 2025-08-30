@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+from config import settings
 from contextlib import asynccontextmanager
 from typing import AsyncIterator, Optional
 
@@ -10,6 +11,9 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
+import logging
+
+logger = logging.getLogger(__name__)
 
 _ENGINE: Optional[AsyncEngine] = None
 _SessionLocal: Optional[sessionmaker] = None
@@ -61,10 +65,22 @@ async def init_db(*, create_tables: bool = True, enable_pgvector: bool = True) -
 
     from api.db.models.chat import ChatSession, ChatMessage 
 
+    mode = (settings.db_set or "keep").lower()
+    logger.info(f"DB set mode = {mode}")
+
     async with engine.begin() as conn:
+        # 확장 생성
         if enable_pgvector:
             await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+
+        # reset 모드면 전체 삭제
+        if mode == "recreate":
+            logger.warning("Dropping ALL tables (DB_SET=recreate)")
+            await conn.run_sync(SQLModel.metadata.drop_all)
+
+        # 테이블 생성 
         if create_tables:
+            logger.info("Ensuring tables (create_all)")
             await conn.run_sync(SQLModel.metadata.create_all)
 
 async def dispose_engine() -> None:

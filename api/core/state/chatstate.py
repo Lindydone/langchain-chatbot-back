@@ -11,7 +11,7 @@ class ModelOpts(TypedDict, total=False):
 class ChatState(TypedDict, total=False):
     messages: List[Message]
 
-    session_id: str = Field(..., min_length=1) # 필수값으로 변경 무조건 필요한 값임 
+    session_id: str = Field(..., min_length=1)
     user_id: str = Field(..., min_length=1)
     opts: ModelOpts
 

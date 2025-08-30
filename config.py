@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     postgres_password: str = Field("chatbot", alias="POSTGRES_PASSWORD")
     postgres_scheme: str = Field("postgresql+asyncpg", alias="POSTGRES_SCHEME")
 
+    db_set: str = Field("keep", alias="DB_SET") 
+     
     # 벡터/임베딩/키
     embedding_model: str = Field("upskyy/bge-m3-korean", alias="EMBEDDING_MODEL")
     openai_api_key: SecretStr | None = Field(None, alias="OPENAI_API_KEY")
@@ -37,6 +39,10 @@ class Settings(BaseSettings):
     os_username: str | None = Field(None, alias="OS_USERNAME")
     os_password: SecretStr | None = Field(None, alias="OS_PASSWORD")
 
+    prompt_budget: int   = Field(6000, alias="PROMPT_BUDGET")
+    reply_reserve: int   = Field(500,  alias="REPLY_RESERVE")
+    history_ratio: float = Field(0.7,  alias="HISTORY_RATIO")
+
     model_config = SettingsConfigDict(
         env_file=".env",                
         env_file_encoding="utf-8",
@@ -44,9 +50,11 @@ class Settings(BaseSettings):
         extra="ignore",                  # 정의되지 않은 키는 무시(에러 방지)
     )
 
+
     @property
     def ALLOWED_ORIGINS(self) -> str:
         return self.allowed_origins
+
 
 
 settings = Settings()

@@ -91,7 +91,6 @@ def _load_env_file_early(path: str, override: bool = False):
             os.environ[k] = v
 
 def pytest_sessionstart(session):
-    """세션 시작 직후, 전역 스킵 훅보다 먼저 테스트용 env를 주입."""
     base = Path(__file__).parent / "envs"
     # 통합 테스트용 env 우선 로드
     _load_env_file_early(str(base / "integration.env"), override=False)
