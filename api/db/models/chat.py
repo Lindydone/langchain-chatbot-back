@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 import uuid
 
 from sqlmodel import SQLModel, Field, Relationship
-from sqlalchemy import Column, DateTime, func
+from sqlalchemy import Column, DateTime, func, Text
 
 def now_utc() -> datetime:
     return datetime.now(timezone.utc)
@@ -23,7 +23,6 @@ class ChatMessage(SQLModel, table=True):
         default_factory=now_utc,
     )
 
-    # 표준: Optional["ChatSession"]
     session: Optional["ChatSession"] = Relationship(back_populates="messages")
 
 
@@ -39,6 +38,12 @@ class ChatSession(SQLModel, table=True):
     )
     user_id: str = Field(index=True, description="사용자 고유 아이디")
     session_title: str = Field(default="New Session", description="session title")
+
+    summary: Optional[str] = Field(
+        default=None,
+        sa_column=Column(Text, nullable=True),
+        description="세션 내용 요약 저장"
+    )
 
     created_at: datetime = Field(
         sa_column=Column(DateTime(timezone=True), server_default=func.now(), nullable=False),
