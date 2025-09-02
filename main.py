@@ -18,20 +18,20 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # DB 준비
-    await init_db(create_tables=True, enable_pgvector=True)
+    await init_db(create_tables=True, enable_pgvector=True)  # 테이블 생성 pgvector는 이후 rag를 위해 남겨둠
 
-    # 모델/그래프 준비
-    model = build_chat_model()
-    app.state.chat_model = model
-    app.state.chat_graph = create_graph(model)
-
-    # 3) Redis 연결 준비
+    # Redis 연결 준비
     await init_redis()
     try:
         app.state.redis = get_redis()
     except RuntimeError:
         app.state.redis = None
 
+    # 모델/그래프 준비
+    model = build_chat_model()
+    app.state.chat_model = model
+    app.state.chat_graph = create_graph(model)
+    
     try:
         yield
     finally:

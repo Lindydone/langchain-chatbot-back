@@ -5,7 +5,7 @@ fastapi>=0.112
 uvicorn[standard]>=0.30
 httpx>=0.27
 pydantic-settings>=2.4
-redis>=5.0    # 지금은 안 써도 ok. 나중에 세션 저장소 교체
+redis>=5.0
 
 pytest>=8.2
 pytest-asyncio>=0.23
@@ -22,3 +22,11 @@ langgraph>=0.3.2
 langchain
 langchain-openai
 langchain-community
+
+# --- 토큰 카운트 백엔드 ---
+tiktoken>=0.7           # ← OpenAI 모델 토크나이저
+# transformers>=4.43     # ← HF 모델 토크나이저
+# tokenizers>=0.15       # ← 콜드스타트 단축용 
+
+# --- RAG(OpenSearch) ---
+# opensearch-py>=2.6
