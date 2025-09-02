@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import List, Dict, Optional
+from typing import List, Optional
+from api.core.state.chatstate import Message
 from config import settings
 from api.utils.token_count import count_text, count_messages
-
-Message = Dict[str, str]
 
 def _measure_text(
     text: str,
@@ -13,14 +12,12 @@ def _measure_text(
     model_name: str,
     provider: Optional[str],
 ) -> int:
-    # 문자열 1개 비용 계산 기본 tokens(토큰) 기준
+    # 문자열 1개 비용 계산 기본 tokens 기준
     if not text:
         return 0
     m = (mode or "tokens").lower()
     if m == "tokens":
         return count_text(text, model_name, provider)
-    if m == "bytes":
-        return len(text.encode("utf-8"))
     return len(text)
 
 
@@ -32,9 +29,12 @@ def _measure_msgs(
     provider: Optional[str],
 ) -> int:
     """메시지 배열 비용 합계."""
-    if (mode or "tokens").lower() == "tokens":
+    if (mode or "tokens").lower() == "tokens":  #TODO 기존엔 옵션으로 선택하는 형태로 진행, 하지만 토큰을 그냥 고정으로 사용하는 것을 선택하여 남아있는 잔재 지울 예정
         return count_messages(msgs, model_name, provider)
-    return sum(_measure_text(m.get("content", "") or "", mode=mode, model_name=model_name, provider=provider) for m in msgs)
+    return sum(
+        _measure_text(m.content or "", mode=mode, model_name=model_name, provider=provider)
+        for m in msgs
+    )
 
 
 def pack_prompt_with_ratio(
@@ -49,12 +49,6 @@ def pack_prompt_with_ratio(
     model_name: Optional[str] = None,
     provider: Optional[str] = None,
 ) -> List[Message]:
-    """
-    최종 프롬프트를 예산(budget_total - reply_reserve) 내에서 구성.
-      - system_msg(있으면 1개) + history(가능한 만큼 최신부터) + current_user(필수)
-      - 초과 시: system을 우선 제거/축소, 그래도 안 되면 user를 안전하게 축소(토큰 기준 근사)
-    history는 '오래→최근' 순서라고 가정.
-    """
     model_name = model_name or settings.model_name
     provider = provider or getattr(settings, "model_provider", None)
 
@@ -76,17 +70,17 @@ def pack_prompt_with_ratio(
         토큰 모드: 간이 비율로 잘라가며 limit 이하가 되게 절삭.
         chars/bytes 모드: 길이 기반 절삭.
         """
-        content = msg.get("content", "") or ""
+        content = msg.content or ""
         if limit <= 0:
-            return {"role": "user", "content": ""}
+            return Message(role="user", content="")
 
         if (mode or "tokens").lower() != "tokens":
             # chars/bytes는 단순 길이 컷
             if len(content) <= limit:
                 return msg
-            return {"role": "user", "content": content[:limit]}
+            return Message(role="user", content=content[:limit])
 
-        # tokens 모드 — 현재 비용이 이미 limit 이하라면 그대로
+        # tokens 모드 — 현재 비용이 이미 limit 이하라면 그대로 반환
         base_cost = _measure_text(content, mode=mode, model_name=model_name, provider=provider)
         if base_cost <= limit:
             return msg
@@ -99,7 +93,7 @@ def pack_prompt_with_ratio(
             step = max(1, approx_len // 10)
             approx_len -= step
             cut = content[:approx_len]
-        return {"role": "user", "content": cut}
+        return Message(role="user", content=cut)
 
     messages: List[Message] = []
 

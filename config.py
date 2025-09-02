@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     # CORS
     allowed_origins: str = Field("*", alias="ALLOWED_ORIGINS")
 
-    model_provider: str = Field("dummy", alias="MODEL_PROVIDER")  # "dummy" | "openai" | "local" ...
+    model_provider: str = Field("openai", alias="MODEL_PROVIDER")  # "openai" | "server" 
     model_name: str = Field("gpt-4o-mini", alias="MODEL_NAME")
     # Redis
     redis_host: str = Field("localhost", alias="REDIS_HOST")

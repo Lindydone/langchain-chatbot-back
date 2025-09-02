@@ -26,7 +26,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:8010/health"]  # ← /health 로 통일
+      test: ["CMD", "curl", "-fsS", "http://localhost:8010/health"]  # /health 로 통일
       interval: 10s
       timeout: 3s
       retries: 3
@@ -38,7 +38,7 @@ services:
     image: pgvector/pgvector:0.8.0-pg17
     container_name: chatbot-postgres
     environment:
-      - POSTGRES_DB=${POSTGRES_DATABASE}          # ← = 문법
+      - POSTGRES_DB=${POSTGRES_DATABASE}          
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_MAX_CONNECTIONS=200
@@ -78,7 +78,7 @@ services:
       - chatbot
   opensearch:
     image: opensearchproject/opensearch:2.12.0
-    profiles: ["search"]                  # ← 중요
+    profiles: ["search"]                  # <- 이걸 사용해 조절 
     container_name: opensearch
     environment:
       - discovery.type=single-node
@@ -93,7 +93,7 @@ services:
       - chatbot
   dashboards:
     image: opensearchproject/opensearch-dashboards:2.12.0
-    profiles: ["search"]                  # ← 중요
+    profiles: ["search"]                  
     container_name: os-dashboards
     environment:
       - OPENSEARCH_HOSTS=http://opensearch:9200

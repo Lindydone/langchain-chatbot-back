@@ -127,7 +127,7 @@ def count_messages(
     *,
     include_roles: bool = False,
 ) -> int:
-    contents = [m.get("content", "") for m in messages]
+    contents = [m.content for m in messages]
     total = sum(count_texts(contents, model_name, provider))
     if include_roles:
         total += 2 * len(messages)

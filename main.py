@@ -20,11 +20,6 @@ async def lifespan(app: FastAPI):
     # DB 준비
     await init_db(create_tables=True, enable_pgvector=True)  # 테이블 생성 pgvector는 이후 rag를 위해 남겨둠
 
-    # 모델/그래프 준비
-    model = build_chat_model()
-    app.state.chat_model = model
-    app.state.chat_graph = create_graph(model)
-
     # Redis 연결 준비
     await init_redis()
     try:
@@ -32,6 +27,11 @@ async def lifespan(app: FastAPI):
     except RuntimeError:
         app.state.redis = None
 
+    # 모델/그래프 준비
+    model = build_chat_model()
+    app.state.chat_model = model
+    app.state.chat_graph = create_graph(model)
+    
     try:
         yield
     finally:

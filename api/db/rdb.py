@@ -19,7 +19,7 @@ _ENGINE: Optional[AsyncEngine] = None
 _SessionLocal: Optional[sessionmaker] = None
 
 def build_db() -> str:
-    env_url = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL")
+    env_url = os.getenv("POSTGRES_URL") # 외부 db에 붙는 다는 가정 (아직은 env에 없음)
     if env_url:
         return env_url
 
@@ -39,7 +39,7 @@ def _ensure_engine() -> AsyncEngine:
             build_db(),
             echo=os.getenv("DB_ECHO", "False").lower() == "true",
             future=True,
-            pool_pre_ping=True,
+            pool_pre_ping=True,  # 이걸로 끊어짐 감지
         )
         _SessionLocal = sessionmaker(
             bind=_ENGINE,
