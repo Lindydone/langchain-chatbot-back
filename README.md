@@ -1,6 +1,6 @@
-LangChain Chatbot Backend
+#LangChain Chatbot Backend
 
-📌 프로젝트 목적
+##📌 프로젝트 목적
 
 이 프로젝트는 LangChain 기반 챗봇 백엔드를 구축하기 위한 템플릿입니다.
 FastAPI를 기반으로 계층형 구조(routers, controllers, adapters,
@@ -11,7 +11,7 @@ services)를 적용하여 유지보수성과 확장성을 높였습니다.
 아직 pytest 최신화 못했습니다 수정 예정
 ------------------------------------------------------------------------
 
-📂 폴더 구조
+## 📂 폴더 구조
 ```
 langchain-chatbot/
 ├── api/
