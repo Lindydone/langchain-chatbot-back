@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Iterable, List, Dict, Optional
-
-Message = Dict[str, str]
+from typing import Iterable, List, Optional
+from api.core.state.chatstate import Message
 
 class _TokenCounter:
     name: str
@@ -35,7 +34,7 @@ class _OpenAITokenCounter(_TokenCounter):
 
 
 # HuggingFace(transformers) 사용
-#   - LLaMA/Mistral/Qwen/Gemma/bge 등
+#   - LLaMA/Qwen/Gemma 등
 class _HFTokenCounter(_TokenCounter):
     name = "hf/transformers"
 
@@ -61,11 +60,10 @@ class _HFTokenCounter(_TokenCounter):
             return [len(self.tok.encode(t or "", add_special_tokens=False)) for t in arr]
 
 
-# --------------------------------
-# 근사치(폴백) 백엔드
-# --------------------------------
+
+# 근사치(폴백) 백엔드 TODO 다른 토크나이저 실패시 사용
 class _ApproxCounter(_TokenCounter):
-    name = "approx/char_div_4"
+    name = "char_ratio"
 
     def __init__(self, model_name: str, chars_per_token: int = 4):
         self.cpt = max(1, int(chars_per_token))
@@ -104,7 +102,7 @@ def get_counter(model_name: str, provider: Optional[str] = None) -> _TokenCounte
         except Exception:
             return _ApproxCounter(m)
 
-    if ("/" in ml) or ml.startswith(("llama", "meta-llama", "mistral", "qwen", "gemma", "phi", "bge", "intfloat/", "upskyy/")):
+    if ("/" in ml) or ml.startswith(("llama", "meta-llama", "qwen", "gemma")):
         try:
             return _HFTokenCounter(m)
         except Exception:

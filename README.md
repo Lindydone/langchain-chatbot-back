@@ -1,6 +1,6 @@
-LangChain Chatbot Backend
+#LangChain Chatbot Backend
 
-📌 프로젝트 목적
+##📌 프로젝트 목적
 
 이 프로젝트는 LangChain 기반 챗봇 백엔드를 구축하기 위한 템플릿입니다.
 FastAPI를 기반으로 계층형 구조(routers, controllers, adapters,
@@ -11,7 +11,7 @@ services)를 적용하여 유지보수성과 확장성을 높였습니다.
 아직 pytest 최신화 못했습니다 수정 예정
 ------------------------------------------------------------------------
 
-📂 폴더 구조
+## 📂 폴더 구조
 ```
 langchain-chatbot/
 ├── api/
@@ -25,8 +25,7 @@ langchain-chatbot/
 │   │   ├── load_history.py        # 히스토리 로드/예산 계산(Redis)
 │   │   ├── build_prompt.py        # system+summary+history+user → 패킹
 │   │   ├── call_model.py          # 모델 호출(어댑터)
-│   │   ├── persist.py             # 메시지 영속화(Postgres/Redis)
-│   │   └── normalizer.py          # 최종 상태 정규화(선택)
+│   │   └── persist.py             # 메시지 영속화(Postgres/Redis)
 │   ├── routers/                   # 라우팅 (health, chat)
 │   ├── controllers/               # HTTP → 그래프 호출/응답 변환
 │   ├── adapters/                  # 외부 연동 (Redis, DB, etc.)
@@ -49,8 +48,8 @@ langchain-chatbot/
 ├── scripts_autocommit/
 ├── Dockerfile
 ├── docker-compose.yml
-├── pyproject.toml
-├── requirements.txt (선택)
+├── pyproject.toml  (pytest 용)
+├── requirements.txt (docker 용)
 ├── pytest.ini
 └── uv.lock
 ```
@@ -166,8 +165,7 @@ Content-Type: application/json
 
 ```json
 {
-  "reply": "안녕하세요! 무엇을 도와드릴까요?",
-  "session_id": "abc-123"
+  "reply": "안녕하세요! 무엇을 도와드릴까요?"
 }
 ```
 
@@ -211,7 +209,7 @@ Content-Type: application/json
 ## 영속화 전략
 
 * **Postgres(SQLModel)**: 세션 존재 보장 후 user/assistant 메시지 저장
-* **Redis**: 최근 대화 히스토리 리스트 보존, `model_dump_json()`으로 push, `LTRIM`으로 윈도 관리(예: 최근 20쌍=40개)
+* **Redis**: 최근 대화 히스토리 리스트 보존, `model_dump_json()`으로 push, `LTRIM`으로 윈도 관리(최근 20쌍=40개)
 
 ---
 

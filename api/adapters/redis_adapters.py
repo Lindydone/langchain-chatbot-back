@@ -8,7 +8,7 @@ def create_redis(
     port: Optional[int] = None,
     db: Optional[int] = None,
     password: Optional[str] = None,
-    decode_responses: bool = True,
+    decode_responses: bool = True,  #NOTE redis에서 자동 디코딩해서 반환해줌
 ) -> Redis:
     kwargs = dict(
         host=host or settings.redis_host,
